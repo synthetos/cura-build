@@ -119,7 +119,7 @@ if(BUILD_OS_WIN32)
 endif()
 
 if(BUILD_PYTHON)
-    set(python_configure_command ./configure --prefix=${CMAKE_INSTALL_PREFIX} --enable-shared --with-threads --without-pymalloc)
+    set(python_configure_command ./configure --prefix=${EXTERNALPROJECT_INSTALL_PREFIX} --enable-shared --with-threads --without-pymalloc)
 
     if(BUILD_OS_OSX)
         # See http://bugs.python.org/issue21381
@@ -132,7 +132,7 @@ if(BUILD_PYTHON)
 
     if(BUILD_OS_LINUX)
         # Set a proper RPATH so everything depending on Python does not need LD_LIBRARY_PATH
-        set(python_configure_command LDFLAGS=-Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib ${python_configure_command})
+        set(python_configure_command LDFLAGS=-Wl,-rpath=${EXTERNALPROJECT_INSTALL_PREFIX}/lib ${python_configure_command})
     endif()
 
     ExternalProject_Add(Python
