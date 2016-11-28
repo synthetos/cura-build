@@ -1,0 +1,24 @@
+language: cpp
+compiler:
+- gcc
+os:
+- osx
+- linux
+before_install:
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then apt-get install -y gfortran python3 python3-dev python3-pyqt5 python3-pyqt5.qtopengl python3-pyqt5.qtquick python3-pyqt5.qtsvg python3-numpy python3-serial python3-opengl python3-setuptools qml-module-qtquick2 qml-module-qtquick-window2 qml-module-qtquick-layouts qml-module-qtquick-dialogs qml-module-qtquick-controls gfortran pkg-config libxcb1-dev libx11-dev ; fi
+script:
+- mkdir build
+- cd build
+- cmake ..
+- make
+- make package
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: ZRhNbxW7y4/7XRb81v/vchbQUCsCjOSSGjnFUbnBJtI7zvIve4MY1kHUyVg1IYeKIYIh0fgGFSeqnc+10fg/7Tsn/8EOmWUlh5DbqCcuu6lvPoCnpumQiQH5cElJ6R9Iux/v4aRw2igDGRGZYFupb16EfcE7ftu4LP4f8AL+CU/z+66BS3FUouh6NjmqkjjLt8nXWKuAkZxwy10qQz+kUXAq970kjRs8lA9nwl+FEJCF+iTPC7z6xhAzggzd3ymtnKRHbUH7lLTDlcZjg9XhQQ9/AmZEb1/PR9akomxi6WiCmWVe51lSlfnhqebUjAH7dJdoRG0W9l167ITmLm4n/NzEsCjQMuUHHexGzXl0mFQ9v10IHWgw595uIV1JDcpLqSfuGR/BOvicn4N+dz0IIN+TNOHvhXcEfD9+p8UUGpjpnh6NuILqynYhN6nZh3vPx9T4BhW91mN5NKyC1kQNscqayXCyhiorB26LwP0SyRwKD1u0xlGU5zZunbnYs4+7MojE+EZvsiSbsb8/IZFzy/X2YlzaJtkIq1SBm1InzNFrRENNG/UF8wl2Cz3//ulMbiDt3/KjlcJ5RoaHjDZ6A1Gyyv/ERBmAwi6fAYIxtWKv8H/ehoquHcCAxi8y7t6WXm80MYL4iByj+P/po07GmX6xkwl/FRUnwHwI6y9+Cdk=
+  file: build/Cura-master.0.0-master-Darwin.dmg
+  on:
+    repo: synthetos/cura-build
