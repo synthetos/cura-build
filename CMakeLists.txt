@@ -123,12 +123,18 @@ if(BUILD_PYTHON)
         # See http://bugs.python.org/issue21381
         # The interpreter crashes when MACOSX_DEPLOYMENT_TARGET=10.7 due to the increased stack size.
         set(patch_command sed -i".bak" "8704,8704d" <SOURCE_DIR>/configure)
+
+        # We also want to set the following flags so it'll pick up OpenSSL from homebrew
+        #set(ENV{LDFLAGS} -L/usr/local/opt/openssl/lib)
+        #set(ENV{} -I/usr/local/opt/openssl/include)
+        set(make_flags "LDFLAGS=-L/usr/local/opt/openssl/lib" "CPPFLAGS=-I/usr/local/opt/openssl/include")
     endif()
 
     ExternalProject_Add(Python
         URL https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tgz
         PATCH_COMMAND ${patch_command}
-        CONFIGURE_COMMAND ./configure --prefix=${EXTERNALPROJECT_INSTALL_PREFIX} --enable-shared --with-threads --without-pymalloc
+        CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${make_flags} ./configure --prefix=${EXTERNALPROJECT_INSTALL_PREFIX} --enable-shared --with-threads --without-pymalloc
+        COMMAND ${CMAKE_COMMAND} -E env ${make_flags} make
         BUILD_IN_SOURCE 1
     )
 
@@ -144,7 +150,11 @@ if(BUILD_QT)
     set(qt_url http://download.qt.io/official_releases/qt/5.5/5.5.1/single/qt-everywhere-opensource-src-5.5.1.tar.gz)
     set(qt_md5 59f0216819152b77536cf660b015d784)
 
-    # Qt uses different sources for Windows 
+    if(APPLE)
+      set(patch_command sed -i.bak "s/-find xcrun/-find xcodebuild/g" <SOURCE_DIR>/qtbase/configure <SOURCE_DIR>/qtbase/mkspecs/features/mac/default_pre.prf)
+    endif()
+
+    # Qt uses different sources for Windows
     if(BUILD_OS_WINDOWS)
         set(qt_url http://download.qt.io/official_releases/qt/5.5/5.5.1/single/qt-everywhere-opensource-src-5.5.1.zip)
         set(qt_md5 d071cdaa1b8f34fb49f6deac94039c2c)
@@ -204,6 +214,7 @@ if(BUILD_QT)
     ExternalProject_Add(Qt
         URL ${qt_url}
         URL_MD5 ${qt_md5}
+        PATCH_COMMAND ${patch_command}
         CONFIGURE_COMMAND ./configure ${qt_options}
         BUILD_IN_SOURCE 1
     )
@@ -304,7 +315,7 @@ if(BUILD_OS_WINDOWS)
     # Because setuptools is stupid and will interpret "C:/..." as a relative path
     string(REPLACE "/" "\\" native_prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
     set(python_install
-        --install-lib=${native_prefix}\\lib\\python3.5\\site-packages 
+        --install-lib=${native_prefix}\\lib\\python3.5\\site-packages
         --install-data=${native_prefix}\\share
         --install-scripts=${native_prefix}\\bin
     )
@@ -593,7 +604,7 @@ elseif(BUILD_OS_WINDOWS)
     else()
         set(NSIS_SCRIPT_COPY_PATH "${CMAKE_BINARY_DIR}/_CPack_Packages/win32/${CPACK_GENERATOR}")
     endif()
-    
+
     add_custom_command(
         TARGET build_exe POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/${CPACK_GENERATOR} ${NSIS_SCRIPT_COPY_PATH}
