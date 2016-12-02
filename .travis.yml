@@ -13,7 +13,7 @@ script:
 - mkdir build
 - cd build
 - cmake ..
-- make
+- travis_wait 60 make
 - make package
 deploy:
   provider: releases
