@@ -161,8 +161,8 @@ if(BUILD_QT)
 
     # Qt uses different sources for Windows
     if(BUILD_OS_WINDOWS)
-        set(qt_url http://download.qt.io/official_releases/qt/5.5/5.5.1/single/qt-everywhere-opensource-src-5.5.1.zip)
-        set(qt_md5 d071cdaa1b8f34fb49f6deac94039c2c)
+        set(qt_url https://download.qt.io/official_releases/qt/5.7/5.7.1/single/qt-everywhere-opensource-src-5.7.1.zip)
+        set(qt_md5 d8d84c6062c15539c5ff9f6f5d781ad8)
     endif()
 
     set(qt_options
@@ -256,7 +256,7 @@ if(BUILD_SIP)
 
     ExternalProject_Add(Sip
         DEPENDS Python
-        URL http://downloads.sourceforge.net/project/pyqt/sip/sip-4.17/sip-4.17.zip
+        URL https://sourceforge.net/projects/pyqt/files/sip/sip-4.18.1/sip-4.18.1.zip
         CONFIGURE_COMMAND ${sip_command}
         BUILD_IN_SOURCE 1
     )
