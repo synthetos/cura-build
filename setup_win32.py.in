@@ -51,26 +51,28 @@ def findSubPackages(root_package_path, package_name):
     for dirpath, dirnames, filenames in os.walk(os.path.dirname(root_package_path)):
         if "__" in dirpath:
             continue
-            
+
         if "tests" in dirnames:
             dirnames.remove("tests")
-            
+
         module_path = dirpath.replace(os.path.dirname(root_package_path), package_name)
         module_path = module_path.split(os.path.sep)
         module_name = ".".join(module_path)
         if os.path.isfile(dirpath + "/__init__.py"):
             includes.append(module_name)
             for filename in filenames:
-                if "__" not in filename and os.path.splitext(filename)[1] in [".py", ".pyd"]:
+                if os.path.splitext(filename)[1] in [".pyd"]:
+                    continue
+                if "__" not in filename and os.path.splitext(filename)[1] in [".py"]:
                     includes.append(module_name + "." + os.path.splitext(filename)[0])
     return includes
 
 includes = [
-    "sip", 
+    "sip",
     "ctypes",
     "uuid",
     "UM",
-    "PyQt5.QtNetwork", 
+    "PyQt5.QtNetwork",
     "PyQt5._QOpenGLFunctions_2_0",
     "serial",
     "Arcus",
@@ -127,7 +129,8 @@ setup(
 if not os.path.isdir("dist"):
     os.mkdir("dist")
 
-build_path = "build\\exe.win-amd64-3.5"
+#build_path = "build\\exe.win-amd64-3.5"
+build_path = "build\\exe.win32-3.5"
 for fname in os.listdir(build_path):
     print("Moving " + fname)
     shutil.move(os.path.join(build_path, fname), os.path.join("dist", fname))
